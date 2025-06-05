@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 resume.pdf
+.DS_Store
