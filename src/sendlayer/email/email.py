@@ -10,8 +10,11 @@ import requests
 from sendlayer.base import BaseClient
 from sendlayer.exceptions import SendLayerError, SendLayerAPIError, SendLayerAuthenticationError, SendLayerValidationError
 
-class NewEmail(BaseClient):
+class Emails:
     """Client for sending emails through SendLayer."""
+
+    def __init__(self, client: BaseClient):
+        self.client = client
     
     def _validate_email(self, email: str) -> bool:
         """Validate email address format."""
@@ -89,8 +92,8 @@ class NewEmail(BaseClient):
         to: Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]],
         from_email: str,
         subject: str,
+        text: str,
         from_name: Optional[str] = None,
-        text: Optional[str] = None,
         html: Optional[str] = None,
         cc: Optional[List[Union[str, Dict[str, Optional[str]]]]] = None,
         bcc: Optional[List[Union[str, Dict[str, Optional[str]]]]] = None,
@@ -155,6 +158,8 @@ class NewEmail(BaseClient):
         if headers:
             payload["Headers"] = headers
         if tags:
+            if not isinstance(tags, list) or not all(isinstance(tag, str) for tag in tags):
+                raise SendLayerValidationError("Tags must be a list of strings.")
             payload["Tags"] = tags
             
-        return self._make_request("POST", "email", json=payload) 
+        return self.client._make_request("POST", "email", json=payload) 

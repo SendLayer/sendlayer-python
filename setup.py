@@ -18,6 +18,7 @@ setup(
     version=get_version(),
     author="SendLayer",
     author_email="support@sendlayer.com",
+    maintainer="David Ozokoye",
     description="Official Python SDK for SendLayer API",
     long_description=long_description,
     long_description_content_type="text/markdown",
