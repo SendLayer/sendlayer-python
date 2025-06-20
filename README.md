@@ -22,13 +22,13 @@ pip install sendlayer
 ## Quick Start
 
 ```python
-from sendlayer import NewEmail
+from sendlayer import SendLayer
 
 # Initialize the email client with your API key
-sendlayer = NewEmail("your-api-key")
+sendlayer = SendLayer("your-api-key")
 
 # Send an email
-response = sendlayer.send(
+response = sendlayer.Emails.send(
     to="recipient@example.com",
     from_email="sender@example.com",
     subject="Test Email",
@@ -48,16 +48,16 @@ response = sendlayer.send(
 
 ### Email Module
 
-Send emails using the `NewEmail` module:
+Send emails using the `SendLayer` module:
 
 ```python
-from sendlayer import NewEmail
+from sendlayer import SendLayer
 
-sendlayer = NewEmail(api_key='your-api-key')
+sendlayer = SendLayer(api_key='your-api-key')
 
 
 # Send a complex email
-response = sendlayer.send(
+response = sendlayer.Emails.send(
     to=[
         {'email': 'recipient1@example.com', 'name': 'Recipient 1'},
         {'email': 'recipient2@example.com', 'name': 'Recipient 2'}
@@ -80,40 +80,41 @@ response = sendlayer.send(
 ### Webhooks Module
 
 ```python
-from sendlayer import Webhooks
+from sendlayer import SendLayer
 
-sendlayer = Webhooks(api_key='your-api-key')
+sendlayer = SendLayer(api_key='your-api-key')
 
 # Create a webhook
 # Webhook event options: bounce, click, open, unsubscribe, complaint, delivery
 
-webhook = sendlayer.create(
+webhook = sendlayer.Webhooks.create(
     url='https://your-domain.com/webhook',
     event='open'
 )
 
 # Get all webhooks
-webhooks = sendlayer.get_all()
+webhooks = sendlayer.Webhooks.get()
 
 # Delete a webhook
-sendlayer.delete(webhook_id=123)
+sendlayer.Webhooks.delete(webhook_id=123)
 ```
 
 ### Events Module
 
 ```python
-from sendlayer import Events
+from sendlayer import SendLayer
 from datetime import datetime, timedelta
 
-sendlayer = Events(api_key='your-api-key')
+sendlayer = SendLayer(api_key='your-api-key')
 
 # Get all events
-events = sendlayer.get()
+events = sendlayer.Events.get()
 
 # Get filtered events
-events = sendlayer.get(
+events = sendlayer.Events.get(
     start_date=datetime.now() - timedelta(hours=4),
     end_date=datetime.now(),
+    event='opened'
 )
 ```
 
@@ -125,16 +126,10 @@ The SDK provides custom exceptions for better error handling:
 from sendlayer import (
     SendLayerError,
     SendLayerAPIError,
-    SendLayerAuthenticationError,
-    SendLayerValidationError
 )
 
 try:
-    response = sendlayer.send(...)
-except SendLayerAuthenticationError:
-    print("Invalid API key")
-except SendLayerValidationError:
-    print("Invalid request parameters")
+    response = sendlayer.Emails.send(...)
 except SendLayerError as e:
     print(f"API error: {e.status_code} - {e.message}")
 except SendLayerError:
