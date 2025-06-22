@@ -17,8 +17,8 @@ def main():
     try:
         # Send a simple email
         response = sendlayer.Emails.send(
+            sender="sender@example.com",
             to="recipient@example.com",
-            from_email="sender@example.com",
             subject="Test Email",
             text="This is a test email sent using the SendLayer Python SDK",
         )
@@ -26,8 +26,8 @@ def main():
 
         # Send an email with advanced options
         response = sendlayer.Emails.send(
+            sender={"email": "sender@example.com", "name": "Paulie Paloma"},
             to=["user1@example.com", "user2@example.co"],
-            from_email="sender@example.com",
             subject="Complex Test Email",
             html="<h1>Hello!</h1><p>This is a test email with all options</p>",
             cc=["cc@example.com"],

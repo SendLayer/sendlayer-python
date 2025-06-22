@@ -6,7 +6,7 @@ from sendlayer.exceptions import SendLayerValidationError
 def test_send_simple_email(email_client):
     response = email_client.Emails.send(
         to="recipient@example.com",
-        from_email="sender@example.com",
+        sender="sender@example.com",
         subject="Test Email",
         text="This is a test email"
     )
@@ -15,8 +15,7 @@ def test_send_simple_email(email_client):
 def test_send_complex_email(email_client):
     response = email_client.Emails.send(
         to=[{"email": "recipient1@example.com", "name": "Recipient 1"}, "recipient2@example.com"],
-        from_email="sender@example.com",
-        from_name="Sender Name",
+        sender={"email": "sender@example.com", "name": "Sender Name"},
         subject="Complex Email",
         html="<p>This is a test email</p>",
         text="This is a test email",
@@ -34,7 +33,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Invalid sender email address"):
         email_client.Emails.send(
             to="recipient@example.com",
-            from_email="invalid-email",
+            sender="invalid-email",
             subject="Test",
             text="Test email content"
         )
@@ -43,7 +42,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Invalid recipient email address"):
         email_client.Emails.send(
             to="invalid-email",
-            from_email="sender@example.com",
+            sender="sender@example.com",
             subject="Test",
             text="Test email content"
         )
@@ -52,7 +51,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Invalid cc email address"):
         email_client.Emails.send(
             to="recipient@example.com",
-            from_email="sender@example.com",
+            sender="sender@example.com",
             subject="Test",
             text="Test email content",
             cc=["invalid-email"]
@@ -62,7 +61,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Invalid bcc email address"):
         email_client.Emails.send(
             to="recipient@example.com",
-            from_email="sender@example.com",
+            sender="sender@example.com",
             subject="Test",
             text="Test email content",
             bcc=["invalid-email"]
@@ -72,7 +71,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Invalid reply_to email address"):
         email_client.Emails.send(
             to="recipient@example.com",
-            from_email="sender@example.com",
+            sender="sender@example.com",
             subject="Test",
             text="Test email content",
             reply_to="invalid-email"
@@ -82,7 +81,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Attachment path is required"):
         email_client.Emails.send(
             to="recipient@example.com",
-            from_email="sender@example.com",
+            sender="sender@example.com",
             subject="Test",
             text="Test email content",
             attachments=[{"type": "text/plain"}]
@@ -92,7 +91,7 @@ def test_send_email_validation(email_client):
     with pytest.raises(SendLayerValidationError, match="Attachment type is required"):
         email_client.Emails.send(
             to="recipient@example.com",
-            from_email="sender@example.com",
+            sender="sender@example.com",
             subject="Test",
             text="Test email content",
             attachments=[{"path": "./test.txt"}]

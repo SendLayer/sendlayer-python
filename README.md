@@ -29,8 +29,8 @@ sendlayer = SendLayer("your-api-key")
 
 # Send an email
 response = sendlayer.Emails.send(
+    sender="sender@example.com",
     to="recipient@example.com",
-    from_email="sender@example.com",
     subject="Test Email",
     text="This is a test email"
 )
@@ -58,12 +58,11 @@ sendlayer = SendLayer(api_key='your-api-key')
 
 # Send a complex email
 response = sendlayer.Emails.send(
+    sender={"email": "sender@example.com", "name": "Paulie Paloma"},
     to=[
         {'email': 'recipient1@example.com', 'name': 'Recipient 1'},
         {'email': 'recipient2@example.com', 'name': 'Recipient 2'}
     ],
-    from_email='sender@example.com',
-    from_name='Sender Name',
     subject='Complex Email',
     html='<p>This is a <strong>test email</strong>!</p>',
     text='This is a test email!',

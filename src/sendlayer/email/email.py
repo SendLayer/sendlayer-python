@@ -24,6 +24,25 @@ class Emails:
     def _read_attachment(self, file_path: str) -> str:
         """Read a file and encode it in base64."""
 
+        # Check if the path is a URL first
+        parsed = urlparse(file_path)
+        is_url = bool(parsed.scheme and parsed.netloc)
+
+        if is_url:
+            # Handle remote file
+            try:
+                timeout = getattr(self.client, 'attachment_url_timeout', 30000) / 1000  # Convert to seconds
+                response = requests.get(file_path, timeout=timeout)
+                response.raise_for_status()
+                file_content = response.content
+                encoded_content = base64.b64encode(file_content).decode("utf-8")
+                return encoded_content
+            except requests.exceptions.RequestException as e:
+                raise SendLayerError(f'Error fetching remote file: {str(e)}')
+            except Exception as e:
+                raise SendLayerValidationError(f"Error reading attachment: {str(e)}")
+
+        # Handle local files
         path_obj = Path(file_path)
         
         # Check if file exists and is readable
@@ -36,29 +55,15 @@ class Emails:
         if not os.access(path_obj, os.R_OK):
             raise SendLayerError(f"File is not readable: {file_path}")
 
-        # Check if the path is a URL
-        parsed = urlparse(file_path)
-        is_url = bool(parsed.scheme and parsed.netloc)
-
         # Get Absolute path
         absolute_path = os.path.abspath(file_path)
-
         relative_path = os.path.join(os.getcwd(), file_path)  # Relative to current working directory
- 
-
 
         try:
-            if is_url:
-                # Handle remote file
-                response = requests.get(file_path, timeout=30)
-                response.raise_for_status()
-                file_content = response.content
-
-           # Try the original path first
-            elif os.path.exists(file_path):
+            # Try the original path first
+            if os.path.exists(file_path):
                 with open(file_path, "rb") as file:
                     file_content = file.read()
-            
             
             elif os.path.exists(absolute_path):
                 with open(absolute_path, "rb") as file:
@@ -67,6 +72,8 @@ class Emails:
             elif os.path.exists(relative_path):
                 with open(relative_path, "rb") as file:
                     file_content = file.read()
+            else:
+                raise FileNotFoundError(f"Attachment file not found: {file_path}")
                 
             # encoded content to base64
             encoded_content = base64.b64encode(file_content).decode("utf-8")
@@ -74,8 +81,6 @@ class Emails:
                 
         except FileNotFoundError:
             raise SendLayerError(f"Attachment file not found: {file_path}")
-        except requests.exceptions.RequestException as e:
-            raise SendLayerError('Error fetching remote file: ', str(e))
         except Exception as e:
             raise SendLayerValidationError(f"Error reading attachment: {str(e)}")
         
@@ -89,24 +94,21 @@ class Emails:
     
     def send(
         self,
+        sender: Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]],
         to: Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]],
-        from_email: str,
         subject: str,
         text: str,
-        from_name: Optional[str] = None,
         html: Optional[str] = None,
-        cc: Optional[List[Union[str, Dict[str, Optional[str]]]]] = None,
-        bcc: Optional[List[Union[str, Dict[str, Optional[str]]]]] = None,
-        reply_to: Optional[Union[str, Dict[str, Optional[str]]]] = None,
+        cc: Optional[Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]]] = None,
+        bcc: Optional[Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]]] = None,
+        reply_to: Optional[Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]]] = None,
         attachments: Optional[List[Dict[str, str]]] = None,
         headers: Optional[Dict[str, str]] = None,
         tags: Optional[List[str]] = None,
     ) -> Dict[str, str]:
         """Send an email through SendLayer."""
-        # Validate email addresses
-        if not self._validate_email(from_email):
-            raise SendLayerValidationError(f"Invalid sender email address: {from_email}")
-            
+        
+        # Validate email addresses       
         def validate_recipient(recipient: Union[str, Dict[str, Optional[str]]], recipient_type: str = "recipient") -> Dict[str, Optional[str]]:
             if isinstance(recipient, str):
                 if not self._validate_email(recipient):
@@ -115,20 +117,14 @@ class Emails:
             if not self._validate_email(recipient['email']):
                 raise SendLayerValidationError(f"Invalid {recipient_type} email address: {recipient['email']}")
             return recipient
+        
+        from_details = validate_recipient(sender, "sender")
             
         to_list = [validate_recipient(r, "recipient") for r in (to if isinstance(to, list) else [to])]
-                
-        if cc:
-            cc = [validate_recipient(r, "cc") for r in cc]
-                    
-        if bcc:
-            bcc = [validate_recipient(r, "bcc") for r in bcc]
-                    
-        if reply_to:
-            reply_to = validate_recipient(reply_to, "reply_to")
+
         
         payload = {
-            "From": {"email": from_email, "name": from_name},
+            "From": from_details,
             "To": to_list,
             "Subject": subject,
             "ContentType": "HTML" if html else "Text",
@@ -136,11 +132,17 @@ class Emails:
         }
         
         if cc:
-            payload["CC"] = cc
+            cc_list = [validate_recipient(r, "cc") for r in (cc if isinstance(cc, list) else [cc])]
+            payload["CC"] = cc_list
+
         if bcc:
-            payload["BCC"] = bcc
+            bcc_list = [validate_recipient(r, "bcc") for r in (bcc if isinstance(bcc, list) else [bcc])]
+            payload["BCC"] = bcc_list
+
         if reply_to:
-            payload["ReplyTo"] = [reply_to]
+            reply_to_list = [validate_recipient(r, "reply_to") for r in (reply_to if isinstance(reply_to, list) else [reply_to])]
+            payload["ReplyTo"] = reply_to_list
+
         if attachments:
             # Validate and transform attachments
             payload["Attachments"] = []
@@ -155,6 +157,7 @@ class Emails:
                     "Disposition": "attachment",
                     "ContentId": int(hash(attachment["path"]))  # Using a unique identifier
                 })
+                
         if headers:
             payload["Headers"] = headers
         if tags:
