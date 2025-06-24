@@ -58,9 +58,9 @@ class Emails:
         # Get Absolute path
         absolute_path = os.path.abspath(file_path)
         relative_path = os.path.join(os.getcwd(), file_path)  # Relative to current working directory
-
+ 
         try:
-            # Try the original path first
+           # Try the original path first
             if os.path.exists(file_path):
                 with open(file_path, "rb") as file:
                     file_content = file.read()
@@ -97,7 +97,7 @@ class Emails:
         sender: Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]],
         to: Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]],
         subject: str,
-        text: str,
+        text: Optional[str] = None,
         html: Optional[str] = None,
         cc: Optional[Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]]] = None,
         bcc: Optional[Union[str, Dict[str, Optional[str]], List[Union[str, Dict[str, Optional[str]]]]]] = None,
@@ -107,8 +107,10 @@ class Emails:
         tags: Optional[List[str]] = None,
     ) -> Dict[str, str]:
         """Send an email through SendLayer."""
+        if not text and not html:
+            raise SendLayerValidationError("Either 'text' or 'html' content must be provided.")
         
-        # Validate email addresses       
+        # Validate email addresses
         def validate_recipient(recipient: Union[str, Dict[str, Optional[str]]], recipient_type: str = "recipient") -> Dict[str, Optional[str]]:
             if isinstance(recipient, str):
                 if not self._validate_email(recipient):
