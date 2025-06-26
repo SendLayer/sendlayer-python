@@ -2,20 +2,13 @@ from setuptools import setup, find_packages
 import os
 import re
 
-def get_version():
-    version_file = os.path.join(os.path.dirname(__file__), "src", "sendlayer", "version.py")
-    with open(version_file, "r") as f:
-        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", f.read(), re.M)
-        if version_match:
-            return version_match.group(1)
-        raise RuntimeError("Unable to find version string.")
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="sendlayer",
-    version=get_version(),
+    # version is dynamically set by pyproject.toml
     author="SendLayer",
     author_email="support@sendlayer.com",
     maintainer="David Ozokoye",

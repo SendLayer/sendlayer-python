@@ -1,10 +1,8 @@
-__version__ = "1.0.0"
+import os
 
-def get_version():
-    """
-    Get the version of the SendLayer Python SDK.
-
-    Returns:
-        str: The version of the SendLayer Python SDK.
-    """
-    return __version__
+_version_path = os.path.join(os.path.dirname(__file__), "VERSION")
+try:
+    with open(_version_path) as f:
+        __version__ = f.read().strip()
+except FileNotFoundError:
+    raise RuntimeError("Unable to find version string.")
