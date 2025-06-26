@@ -24,6 +24,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/sendlayer/sendlayer-python",
     packages=find_packages(where="src"),
+    keywords=["email", "sendlayer", "sdk", "api", "transactional email", "mail", "send email", "email api", "sendlayer api", "send email python", "python email package"],
     package_dir={"": "src"},
     classifiers=[
         "Development Status :: 4 - Beta",
