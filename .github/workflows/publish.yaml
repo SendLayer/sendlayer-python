@@ -55,7 +55,7 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          VERSION=$(python -c "exec(open('src/sendlayer/version.py').read()); print(__version__)")
+          VERSION=$(cat src/sendlayer/VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
