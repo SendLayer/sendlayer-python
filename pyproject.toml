@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sendlayer"
-dynamic = ["version"]
+dynamic = ["version", "dependencies"]
 authors = [
     { name = "SendLayer", email = "support@sendlayer.com" }
 ]
@@ -28,9 +28,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-dependencies = [
-    "requests>=2.25.0",
-]
 
 [project.urls]
 "Homepage" = "https://github.com/sendlayer/sendlayer-python"
@@ -40,4 +37,5 @@ package-dir = {"" = "src"}
 packages = {find = {where = ["src"]}}
 
 [tool.setuptools.dynamic]
-version = {attr = "sendlayer.__version__"} 
+version = {file = "src/sendlayer/VERSION"}
+dependencies = {file = "requirements.txt"} 
