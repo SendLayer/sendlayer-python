@@ -8,6 +8,7 @@ from .exceptions import (
     SendLayerError,
     SendLayerAPIError,
 )
+from .version import __version__
 
 class SendLayer:
     def __init__(self, api_key: str):
@@ -20,4 +21,5 @@ __all__ = [
     "SendLayer",
     "SendLayerError",
     "SendLayerAPIError",
+    "__version__"
 ] 

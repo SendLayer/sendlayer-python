@@ -40,4 +40,4 @@ package-dir = {"" = "src"}
 packages = {find = {where = ["src"]}}
 
 [tool.setuptools.dynamic]
-version = {file = "src/sendlayer/version.py"} 
+version = {attr = "sendlayer.__version__"} 
