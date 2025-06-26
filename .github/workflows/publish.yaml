@@ -25,6 +25,10 @@ jobs:
           pip freeze > requirements.txt
           pip install -r requirements.txt
           pip install pytest
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
+      - name: Install package in editable mode
+        run: pip install -e .
       - name: Run tests
         run: pytest
 
