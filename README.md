@@ -135,32 +135,9 @@ except SendLayerError:
     print("An unexpected error occurred")
 ```
 
-## Development
+## More Details
+To learn more about using the SendLayer SDK, be sure to check our [Developer Documentation](https://developers.sendlayer.com/sdks/python).
 
-### Setup
-
-1. Clone the repository
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -e ".[dev]"
-   ```
-
-### Running Tests
-
-```bash
-pytest
-```
-
-### Building the Package
-
-```bash
-python setup.py sdist bdist_wheel
-```
 
 ## License
 
