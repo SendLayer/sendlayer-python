@@ -11,7 +11,7 @@ authors = [
 maintainers = [
     { name = "David Ozokoye" }
 ]
-keywords=["email", "sendlayer", "sdk", "api", "transactional email", "mail", "send email", "email api", "sendlayer api", "send email python", "python email package"],
+keywords=["email", "sendlayer", "sdk", "api", "transactional email", "mail", "send email", "email api", "sendlayer api", "send email python", "python email package"]
 
 description = "Official Python SDK for SendLayer API"
 readme = "README.md"
