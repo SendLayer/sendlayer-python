@@ -4,8 +4,11 @@ from sendlayer.base import BaseClient
 from sendlayer.exceptions import SendLayerValidationError
 
 
-class Events(BaseClient):
+class Events:
     """Client for retrieving email events from SendLayer."""
+
+    def __init__(self, client: BaseClient):
+        self.client = client
     
     def get(
         self,
@@ -58,10 +61,11 @@ class Events(BaseClient):
                 raise SendLayerValidationError("Error: Invalid retrieve count - must be between 1 and 100")
             params["RetrieveCount"] = retrieve_count
             
-        response = self._make_request("GET", "events", params=params)
+        response = self.client._make_request("GET", "events", params=params)
         events =  response.get('Events', [])
         total_records = response.get('TotalRecords', 0)
 
-        return {"totalRecords": total_records, 
+        return {
+                "totalRecords": total_records, 
                 "events": events
             }

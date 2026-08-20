@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 from sendlayer import (
-    NewEmail,
+    SendLayer,
     SendLayerError
 )
 
@@ -12,22 +12,22 @@ def main():
     # Initialize the email client with your API key
     api_key = os.getenv("SENDLAYER_API_KEY")
 
-    client = NewEmail(api_key)
+    sendlayer = SendLayer(api_key)
 
     try:
         # Send a simple email
-        response = client.send(
+        response = sendlayer.Emails.send(
+            sender="sender@example.com",
             to="recipient@example.com",
-            from_email="sender@example.com",
             subject="Test Email",
             text="This is a test email sent using the SendLayer Python SDK",
         )
         print(f"Email sent successfully! Message ID: {response['MessageID']}")
 
         # Send an email with advanced options
-        response = client.send(
+        response = sendlayer.Emails.send(
+            sender={"email": "sender@example.com", "name": "Paulie Paloma"},
             to=["user1@example.com", "user2@example.co"],
-            from_email="sender@example.com",
             subject="Complex Test Email",
             html="<h1>Hello!</h1><p>This is a test email with all options</p>",
             cc=["cc@example.com"],

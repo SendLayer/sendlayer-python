@@ -1,18 +1,23 @@
 from setuptools import setup, find_packages
+import os
+import re
+
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="sendlayer",
-    version="1.0.0",
+    # version is dynamically set by pyproject.toml
     author="SendLayer",
     author_email="support@sendlayer.com",
+    maintainer="David Ozokoye",
     description="Official Python SDK for SendLayer API",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/sendlayer/sendlayer-python",
     packages=find_packages(where="src"),
+    keywords=["email", "sendlayer", "sdk", "api", "transactional email", "mail", "send email", "email api", "sendlayer api", "send email python", "python email package"],
     package_dir={"": "src"},
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -29,5 +34,5 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "requests>=2.25.0",
-    ],
+    ]
 ) 

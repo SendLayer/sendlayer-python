@@ -1,25 +1,23 @@
 """SendLayer Python SDK."""
 
 from .base import BaseClient
-from .email import NewEmail
+from .email import Emails
 from .webhooks import Webhooks
 from .events import Events
 from .exceptions import (
     SendLayerError,
     SendLayerAPIError,
-    SendLayerAuthenticationError,
-    SendLayerValidationError
 )
 
+class SendLayer:
+    def __init__(self, api_key: str):
+        client = BaseClient(api_key)
+        self.Emails = Emails(client)
+        self.Webhooks = Webhooks(client)
+        self.Events = Events(client)
 
-__version__ = "1.0.0"
 __all__ = [
-    "BaseClient",
-    "NewEmail",
-    "Webhooks",
-    "Events",
+    "SendLayer",
     "SendLayerError",
     "SendLayerAPIError",
-    "SendLayerAuthenticationError",
-    "SendLayerValidationError"
 ] 

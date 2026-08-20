@@ -1,7 +1,7 @@
 import pytest
 import os
 from unittest.mock import Mock, patch
-from sendlayer import NewEmail, Webhooks, Events
+from sendlayer import SendLayer
 
 @pytest.fixture
 def mock_response():
@@ -22,7 +22,7 @@ def mock_session(mock_response):
 def email_client(mock_session):
     """Create a test email client with mocked session."""
     with patch("requests.Session", return_value=mock_session):
-        client = NewEmail("test-api-key")
+        client = SendLayer("test-api-key")
         mock_session.request.return_value.json.return_value = {"MessageID": "test-message-id"}
         
         # Create a test attachment file for tests
@@ -39,7 +39,7 @@ def email_client(mock_session):
 def webhooks_client(mock_session):
     """Create a test webhooks client with mocked session."""
     with patch("requests.Session", return_value=mock_session):
-        client = Webhooks("test-api-key")
+        client = SendLayer("test-api-key")
         # For different methods, we'll return different responses
         # The default for all operations is NewWebhookID
         mock_session.request.return_value.json.return_value = {
@@ -58,7 +58,7 @@ def webhooks_client(mock_session):
 def events_client(mock_session):
     """Create a test events client with mocked session."""
     with patch("requests.Session", return_value=mock_session):
-        client = Events("test-api-key")
+        client = SendLayer("test-api-key")
         # Return the format that matches the events module implementation
         mock_session.request.return_value.json.return_value = {
             "TotalRecords": 2,

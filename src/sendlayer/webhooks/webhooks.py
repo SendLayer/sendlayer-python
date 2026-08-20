@@ -3,8 +3,11 @@ import re
 from sendlayer.base import BaseClient
 from sendlayer.exceptions import SendLayerValidationError
 
-class Webhooks(BaseClient):
+class Webhooks:
     """Client for managing webhooks in SendLayer."""
+
+    def __init__(self, client: BaseClient):
+        self.client = client
     
     def _validate_url(self, url: str) -> bool:
         """Validate URL format."""
@@ -25,13 +28,13 @@ class Webhooks(BaseClient):
 
         # Validate event name
         if event not in event_options:
-            raise SendLayerValidationError(f"Error: Invalid event name - '{event}' is not a valid event name")
+            raise SendLayerValidationError(f"Error: '{event}' is not a valid event name. Supported events include {event_options}")
 
-        return self._make_request("POST", "webhooks", json=payload)
+        return self.client._make_request("POST", "webhooks", json=payload)
     
-    def get_all(self) -> Dict[str, List[Dict[str, Any]]]:
+    def get(self) -> Dict[str, List[Dict[str, Any]]]:
         """Get all webhooks."""
-        response = self._make_request("GET", "webhooks")
+        response = self.client._make_request("GET", "webhooks")
         return response
     
     def delete(self, webhook_id: int) -> None:
@@ -44,4 +47,4 @@ class Webhooks(BaseClient):
         if webhook_id <= 0:
             raise SendLayerValidationError("WebhookID must be greater than 0")
         
-        return self._make_request("DELETE", f"webhooks/{webhook_id}") 
+        return self.client._make_request("DELETE", f"webhooks/{webhook_id}") 
