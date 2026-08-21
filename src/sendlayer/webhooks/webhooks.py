@@ -37,7 +37,7 @@ class Webhooks:
         response = self.client._make_request("GET", "webhooks")
         return response
     
-    def delete(self, webhook_id: int) -> None:
+    def delete(self, webhook_id: int) -> Dict[str, Any]:
         """Delete a webhook by ID."""
         
         # Validate webhook_id
