@@ -224,6 +224,10 @@ for the full table (`14` = recipient suppressed, `17` = email quota reached,
 ## More Details
 To learn more about using the SendLayer SDK, be sure to check our [Developer Documentation](https://developers.sendlayer.com/sdks/python).
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.
+
 
 ## License
 
