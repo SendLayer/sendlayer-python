@@ -96,3 +96,43 @@ def test_send_email_validation(email_client):
             text="Test email content",
             attachments=[{"path": "./test.txt"}]
         ) 
+
+def test_both_html_and_text_are_sent(capturing_email_client):
+    """Regression: supplying both parts must send both, not just the HTML one."""
+    client, payload = capturing_email_client
+    client.Emails.send(
+        sender="sender@example.com",
+        to="recipient@example.com",
+        subject="Subject",
+        text="plain text fallback",
+        html="<p>html body</p>",
+    )
+
+    assert payload["HTMLContent"] == "<p>html body</p>"
+    assert payload["PlainContent"] == "plain text fallback"
+    # HTML takes precedence for the declared content type.
+    assert payload["ContentType"] == "HTML"
+
+
+def test_text_only_sends_plain_content_only(capturing_email_client):
+    client, payload = capturing_email_client
+    client.Emails.send(
+        sender="sender@example.com", to="recipient@example.com",
+        subject="Subject", text="text body",
+    )
+
+    assert payload["ContentType"] == "Text"
+    assert payload["PlainContent"] == "text body"
+    assert "HTMLContent" not in payload
+
+
+def test_html_only_sends_html_content_only(capturing_email_client):
+    client, payload = capturing_email_client
+    client.Emails.send(
+        sender="sender@example.com", to="recipient@example.com",
+        subject="Subject", html="<p>html body</p>",
+    )
+
+    assert payload["ContentType"] == "HTML"
+    assert payload["HTMLContent"] == "<p>html body</p>"
+    assert "PlainContent" not in payload
