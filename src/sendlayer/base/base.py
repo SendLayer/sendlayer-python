@@ -12,6 +12,10 @@ from ..exceptions import (
 
 class BaseClient:
     """Base client for SendLayer API interactions."""
+
+    #: Seconds to wait for the API before giving up. requests defaults to
+    #: no timeout, which lets a hung connection block forever.
+    DEFAULT_TIMEOUT = 30
     
     def __init__(self, api_key: str, config: Optional[Dict[str, Any]] = None):
         """Initialize the base client with API key and optional configuration."""
@@ -29,11 +33,16 @@ class BaseClient:
             "Content-Type": "application/json"
         })
         
+        # requests.Session has no honoured `timeout` attribute -- Session.request()
+        # only reads the per-request keyword -- so hold it here and pass it on
+        # every call instead.
+        self.timeout = config.get('timeout', self.DEFAULT_TIMEOUT)
+
         # Apply any additional session configuration from config
         if 'requests' in config:
             requests_config = config['requests']
             if 'timeout' in requests_config:
-                self._session.timeout = requests_config['timeout']
+                self.timeout = requests_config['timeout']
             if 'headers' in requests_config:
                 self._session.headers.update(requests_config['headers'])
 
@@ -134,7 +143,14 @@ class BaseClient:
         requests exception to the caller.
         """
         url = f"{self.base_url}/{endpoint}"
-        response = self._session.request(method, url, **kwargs)
+        kwargs.setdefault("timeout", self.timeout)
+
+        try:
+            response = self._session.request(method, url, **kwargs)
+        except requests.exceptions.Timeout as exc:
+            raise SendLayerError(f"Request timed out after {self.timeout}s") from exc
+        except requests.exceptions.RequestException as exc:
+            raise SendLayerError(f"Connection error: {exc}") from exc
 
         if not response.ok:
             raise self._build_error(response)
