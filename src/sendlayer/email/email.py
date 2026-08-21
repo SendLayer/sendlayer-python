@@ -125,13 +125,24 @@ class Emails:
         to_list = [validate_recipient(r, "recipient") for r in (to if isinstance(to, list) else [to])]
 
         
+        # Both parts are sent when both are supplied. A single computed key could
+        # only ever emit one of them, which silently dropped the plain-text part.
+        has_html = bool(html)
+        has_text = bool(text)
+
         payload = {
             "From": from_details,
             "To": to_list,
             "Subject": subject,
-            "ContentType": "HTML" if html else "Text",
-            "HTMLContent" if html else "PlainContent": html or text
+            # HTML wins for the declared content type whenever an HTML body is present.
+            "ContentType": "HTML" if has_html else "Text",
         }
+
+        if has_html:
+            payload["HTMLContent"] = html
+
+        if has_text:
+            payload["PlainContent"] = text
         
         if cc:
             cc_list = [validate_recipient(r, "cc") for r in (cc if isinstance(cc, list) else [cc])]

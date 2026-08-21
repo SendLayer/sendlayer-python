@@ -76,3 +76,23 @@ def events_client(mock_session):
             ]
         }
         return client 
+
+@pytest.fixture
+def capturing_email_client(mock_session):
+    """Email client that records the JSON payload sent to the API.
+
+    Yields (client, captured) where `captured` is a dict populated with the
+    request body on each send, so tests can assert on the exact payload built.
+    """
+    captured = {}
+
+    def _record(method, url, **kwargs):
+        captured.clear()
+        captured.update(kwargs.get("json") or {})
+        return mock_session.request.return_value
+
+    with patch("requests.Session", return_value=mock_session):
+        client = SendLayer("test-api-key")
+        mock_session.request.return_value.json.return_value = {"MessageID": "test-message-id"}
+        mock_session.request.side_effect = _record
+        yield client, captured
